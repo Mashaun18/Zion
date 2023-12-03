@@ -11,17 +11,17 @@ from .serializers import ProductSerializer, CartSerializer, CartItemSerializer
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def products(request):
-    products = Product.objects.all()
-    serializer = ProductSerializer(products, many=True)
+    produc = Product.objects.all()
+    serializer = ProductSerializer(produc, many=True)
     return Response(serializer.data)
 
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def product(request, pk):
-    product = Product.objects.get(id=pk)
-    serializer = ProductSerializer(product, many=False)
+def product(request, id):
+    pro = Product.objects.get(id=id)
+    serializer = ProductSerializer(pro, many=False)
     return Response(serializer.data)
 
 
