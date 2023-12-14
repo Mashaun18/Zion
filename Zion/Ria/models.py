@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 import uuid
 
 
+PRODUCT_STATUS = (
+    ('Available', 'Available'),
+    ('Unavailable', 'Unavailable')
+)
+
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
@@ -11,7 +17,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='Ria_images/', blank=True, null=True)
     other_image = models.ImageField(upload_to='Ria_images/', blank=True, null=True)
-    status = models.BooleanField(default=True)
+    status = models.CharField(max_length=100, choices=PRODUCT_STATUS)
 
     def __str__(self):
         return self.name

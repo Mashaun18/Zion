@@ -7,6 +7,11 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+# class AddProductSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Product
+#         fields = ['product', 'quantity']
+
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
@@ -15,4 +20,4 @@ class CartSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = '__all__'
+        fields = ['product', 'quantity']

@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, permissions
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import Product, Cart, CartItem
@@ -9,7 +9,7 @@ from .serializers import ProductSerializer, CartSerializer, CartItemSerializer
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def products(request):
     produc = Product.objects.all()
     serializer = ProductSerializer(produc, many=True)
@@ -18,7 +18,7 @@ def products(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def product(request, id):
     pro = Product.objects.get(id=id)
     serializer = ProductSerializer(pro, many=False)
@@ -65,28 +65,54 @@ def cart_items(request):
         return Response({"detail": "No cart available for this user"})
 
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def add_cart_item(request, id):
+#     current_cart = Cart.objects.get(id=id)
+#     data = request.data
+#     user = request.user
+#     try:
+#         cart = Cart.objects.get(user=user)
+#     except Cart.DoesNotExist:
+#         return Response({"detail": "No cart available for this user"})
+
+#     product_id = data.get('product_id')
+#     try:
+#         product = Product.objects.get(id=product_id)
+#     except Product.DoesNotExist:
+#         return Response({"detail": "Invalid product id"})
+    
+#     quantity = data.get('quantity')
+#     if quantity <= 0:
+#         return Response({"detail": "Quantity must be greater than 0"})
+
+#     cart_item, created = CartItem.objects.get_or_create(
+#         cart=cart, product=product)
+#     cart_item.quantity += quantity
+#     cart_item.save()
+
+#     return Response({"detail": "Cart item added successfully"})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_cart_item(request):
-    data = request.data
-    user = request.user
-    try:
-        cart = Cart.objects.get(user=user)
-    except Cart.DoesNotExist:
-        return Response({"detail": "No cart available for this user"})
-
-    product_id = data.get('product_id')
-    try:
-        product = Product.objects.get(id=product_id)
-    except Product.DoesNotExist:
-        return Response({"detail": "Invalid product id"})
+def add_cart_item(request, cart_id):
+    current_cart = get_object_or_404(Cart, id=cart_id, user=request.user)
     
-    quantity = data.get('quantity')
+    data = request.data
+    product_name = data.get('product_name')
+    quantity = data.get('quantity', 1) 
+
+    try:
+        product = Product.objects.get(id=product_name)
+    except Product.DoesNotExist:
+        return Response({"detail": "Invalid product id"}, status=400)
+
     if quantity <= 0:
-        return Response({"detail": "Quantity must be greater than 0"})
+        return Response({"detail": "Quantity must be greater than 0"}, status=400)
 
     cart_item, created = CartItem.objects.get_or_create(
-        cart=cart, product=product)
+        cart=current_cart, product=product)
+   
     cart_item.quantity += quantity
     cart_item.save()
 
