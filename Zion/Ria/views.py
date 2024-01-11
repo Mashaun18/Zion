@@ -104,13 +104,13 @@ def add_cart_item(request, cart_id):
     return Response({"detail": "Cart item added successfully"}, status=status.HTTP_201_CREATED)
 
 
-@api_view(['POST'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_cart_item(request, product_id, cart_id):
     # data = request.data
     user = request.user
     try:
-        cart = Cart.objects.get(user=user)
+        cart = Cart.objects.filter(user=user)
     except Cart.DoesNotExist:
         return Response({"detail": "No cart available for this user"})
 
@@ -121,7 +121,7 @@ def remove_cart_item(request, product_id, cart_id):
         return Response({"detail": "Invalid product id"})
 
     try:
-        cart_item = CartItem.objects.get(cart=cart_id, product=product_id)
+        cart_item = CartItem.objects.filter(cart=cart_id, product=product_id)
         cart_item.delete()
         return Response({"detail": "Cart item removed successfully"})
     except CartItem.DoesNotExist:
