@@ -1,4 +1,3 @@
-"# Zion" 
  ## Zion's E-commerce App
 
 This is a simple e-commerce application built using Django. It allows users to browse products, add them to their cart, and checkout.
